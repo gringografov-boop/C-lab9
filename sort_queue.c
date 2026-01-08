@@ -2,57 +2,66 @@
 #include "sort_queue.h"
 #include <stdio.h>
 
-static void insert_recursive(queue* q, size_t text, data_type elem, size_t n) {
-    if (text == 0) {
-        queue_set(q, 0, elem);
+static void queue_insert_sorted(queue* q, data_type elem) {
+    queue buf;
+    queue_create(&buf);
+
+    int inserted = 0;
+    size_t n = queue_size(q);
+
+    for (size_t i = 0; i < n; ++i) {
+        data_type cur = queue_front(q);
+        queue_pop_front(q);
+
+        if (!inserted && elem.key < cur.key) {
+            queue_push_back(&buf, elem);
+            inserted = 1;
+        }
+        queue_push_back(&buf, cur);
+    }
+
+    if (!inserted) {
+        queue_push_back(&buf, elem);
+    }
+
+    n = queue_size(&buf);
+    for (size_t i = 0; i < n; ++i) {
+        data_type cur = queue_front(&buf);
+        queue_pop_front(&buf);
+        queue_push_back(q, cur);
+    }
+}
+
+static void sort_queue_recursive(queue* q, size_t processed) {
+    size_t n = queue_size(q);
+    if (processed >= n) {
         return;
     }
 
-    data_type prev = queue_at(q, text - 1);
+    data_type x = queue_front(q);
+    queue_pop_front(q);
 
-    if (prev.key <= elem.key) {
-        queue_set(q, text, elem);
-        return;
-    }
-
-    queue_set(q, text, prev);
-    insert_recursive(q, text - 1, elem, n);
+    sort_queue_recursive(q, processed + 1);
+    queue_insert_sorted(q, x);
 }
 
 void sort_queue_insertion_recursive(queue* q, size_t n) {
-    if (n >= q->count) {
-        return;
-    }
-
-    data_type current = queue_at(q, n);
-
-    insert_recursive(q, n, current, n);
-
-    sort_queue_insertion_recursive(q, n + 1);
+    (void)n;
+    sort_queue_recursive(q, 0);
 }
 
 void sort_queue(queue* q) {
-    printf("\n--- Íà÷àëî ñîðòèðîâêè âñòàâêàìè (ðåêóðñèâíî) ---\n");
-    if (q->count <= 1) {
-        printf("Î÷åðåäü óæå îòñîðòèðîâàíà (0 èëè 1 ýëåìåíò)\n");
+    printf("\nÐÐ°Ñ‡Ð°Ð»Ð¾ ÑÐ¾Ñ€Ñ‚Ð¸Ñ€Ð¾Ð²ÐºÐ¸ Ð¾Ñ‡ÐµÑ€ÐµÐ´Ð¸ (Ð²ÑÑ‚Ð°Ð²ÐºÐ°Ð¼Ð¸, Ñ€ÐµÐºÑƒÑ€ÑÐ¸Ð²Ð½Ð¾)\n");
+    if (queue_size(q) <= 1) {
+        printf("ÐžÑ‡ÐµÑ€ÐµÐ´ÑŒ ÑƒÐ¶Ðµ Ð¾Ñ‚ÑÐ¾Ñ€Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð° (0 Ð¸Ð»Ð¸ 1 ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚)\n");
         return;
     }
 
-    sort_queue_insertion_recursive(q, 1);
-    printf("--- Êîíåö ñîðòèðîâêè ---\n");
+    sort_queue_insertion_recursive(q, 0);
+    printf("--- ÐšÐ¾Ð½ÐµÑ† ÑÐ¾Ñ€Ñ‚Ð¸Ñ€Ð¾Ð²ÐºÐ¸ ---\n");
 }
 
 void queue_insert_sorted_recursive(queue* q, size_t i) {
-    if (i == 0) {
-        return;
-    }
-
-    data_type curr = queue_at(q, i);
-    data_type prev = queue_at(q, i - 1);
-
-    if (curr.key < prev.key) {
-        queue_set(q, i, prev);
-        queue_set(q, i - 1, curr);
-        queue_insert_sorted_recursive(q, i - 1);
-    }
+    (void)q;
+    (void)i;
 }
