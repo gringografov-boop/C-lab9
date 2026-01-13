@@ -97,6 +97,39 @@ void test_sorted(void) {
     queue_destroy(&q);
 }
 
+void test_iterators(void) {
+    printf("\n ТЕСТ: Работа с итераторами \n");
+    queue q;
+    queue_create(&q);
+
+    data_type data[] = { {50, 500}, {30, 300}, {80, 800} };
+    for (int i = 0; i < 3; i++) {
+        queue_push(&q, data[i]);
+    }
+
+    printf("Проход по очереди с помощью итератора (вперёд):\n");
+    iterator it = queue_begin(&q);
+    int pos = 0;
+    while (iter_valid(it)) {
+        data_type* elem = iter_deref(it);
+        printf("Позиция %d: key=%d, value=%d\n", pos, elem->key, elem->value);
+        it = iter_next(it);
+        pos++;
+    }
+
+    printf("\nПроход в обратном направлении с итератором:\n");
+    if (!queue_is_empty(&q)) {
+        it = queue_begin(&q);
+        it.pos = queue_size(&q) - 1;
+        while (iter_valid(it)) {
+            data_type* elem = iter_deref(it);
+            printf("Позиция %zu: key=%d, value=%d\n", it.pos, elem->key, elem->value);
+            if (it.pos == 0) break;
+            it = iter_prev(it);
+        }
+    }
+}
+
 int main(void) {
     setlocale(LC_ALL, "");
 
@@ -104,6 +137,7 @@ int main(void) {
     test_empty();
     test_single();
     test_sorted();
-
+    test_iterators();
     return 0;
 }
+
