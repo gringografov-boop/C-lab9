@@ -78,3 +78,40 @@ void queue_print(const queue* q) {
     printf("Очередь (%zu элементов): ", queue_size(q));
     queue_print_recursive_impl(q, 0);
 }
+
+iterator queue_begin(queue* q) {
+    iterator it;
+    it.cont = q;
+    it.pos  = 0;
+    return it;
+}
+
+bool iter_valid(iterator it) {
+    if (it.cont == NULL) return false;
+    return it.pos < queue_size(it.cont);
+}
+
+iterator iter_next(iterator it) {
+    if (!iter_valid(it)) {
+        return it;
+    }
+    it.pos++;
+    return it;
+}
+
+iterator iter_prev(iterator it) {
+    if (it.cont == NULL) return it;
+    if (it.pos == 0) return it;
+    it.pos--;
+    return it;
+}
+
+data_type* iter_deref(iterator it) {
+    if (!iter_valid(it)) {
+        return NULL;
+    }
+    queue* q = it.cont;
+    size_t idx = (q->head + it.pos) % 100;
+    return &q->data[idx];
+}
+
