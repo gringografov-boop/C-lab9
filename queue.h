@@ -30,4 +30,16 @@ bool   queue_front(const queue* q, data_type* out);
 
 void   queue_print(const queue* q);
 
+typedef struct {
+    size_t pos;
+    queue* cont;
+} iterator;
+
+iterator  queue_begin(queue* q);
+iterator  iter_next(iterator it);
+iterator  iter_prev(iterator it);
+data_type* iter_deref(iterator it);
+bool      iter_valid(iterator it);
+
 #endif
+
